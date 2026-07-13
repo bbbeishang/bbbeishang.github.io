@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>SUSHI</title>
+<style>
+ 
+  :root{
+    --bg: #050505;
+    --green: #b6ff2e;
+    --green-dim: #7fbf1f;
+    --white: #e8e8e0;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--green);
+    font-family:  monospace;
+    min-height: 100vh;
+  }
+
+  .wrap{
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 90px 24px 60px;
+  }
+
+  h1{
+    color: var(--green);
+    font-size: 34px;
+    font-weight: normal;
+    margin: 0 0 28px;
+    letter-spacing: 1px;
+  }
+
+  .sub{
+    color: var(--white);
+    font-size: 16px;
+    margin: 0 0 6px;
+  }
+
+  .zh{
+    color: var(--white);
+    font-size: 18px;
+    margin: 0 0 18px;
+  }
+
+  a{
+    color: var(--white);
+    text-decoration: underline;
+  }
+  a:hover{ color: var(--green); }
+
+  .count-block{
+    margin: 48px 0 40px;
+    text-align: center;
+  }
+
+  .count-label{
+    color: var(--green-dim);
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+
+  .count-number{
+    font-size: 96px;
+    color: var(--green);
+    line-height: 1;
+    text-shadow: 0 0 10px rgba(182,255,46,0.25);
+  }
+
+  .btn-row{
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 26px;
+    flex-wrap: wrap;
+  }
+
+  button{
+    font-family:  monospace;
+    background: transparent;
+    border: 1px solid var(--green-dim);
+    color: var(--green);
+    padding: 10px 22px;
+    font-size: 16px;
+    cursor: pointer;
+    letter-spacing: 1px;
+  }
+  button:hover{
+    background: var(--green);
+    color: #050505;
+  }
+  button.quiet{
+    border-color: #444;
+    color: var(--white);
+  }
+  button.quiet:hover{
+    background: var(--white);
+    color: #050505;
+  }
+
+  .img-box{
+    margin: 50px auto 0;
+    max-width: 560px;
+    border: 1px dashed var(--green-dim);
+    min-height: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 16px;
+    background: rgba(182,255,46,0.02);
+  }
+
+  .img-box img{
+    max-width: 100%;
+    max-height: 480px;
+    display: block;
+  }
+
+  .img-placeholder{
+    color: var(--green-dim);
+    font-size: 14px;
+    text-align: center;
+    line-height: 1.7;
+  }
+
+  .file-row{
+    text-align: center;
+    margin-top: 16px;
+  }
+
+  input[type="file"]{
+    font-family:  monospace;
+    color: var(--white);
+    font-size: 13px;
+  }
+
+  .caption{
+    text-align: center;
+    color: var(--white);
+    font-size: 13px;
+    margin-top: 10px;
+    min-height: 18px;
+  }
+
+  .prompt{
+    color: var(--green-dim);
+  }
+  .prompt::before{
+    content: "> ";
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="zh">上帝保佑你</div>
+  <h1>Sushi</h1>
+  <p class="sub prompt">Todo el sushi que he comido en...(?)</1p>
+
+  <div class="count-block">
+    <div class="count-label">voy en el numero</div>
+    <div class="count-number" id="countNumber">0</div>
+
+    <div class="btn-row">
+      <button id="incrementBtn">+1</button>
+      <button class="quiet" id="decrementBtn">-1</button>
+     
+    </div>
+  </div>
+
+  <div class="img-box" id="imgBox">
+    <div class="img-placeholder" id="imgPlaceholder">
+      [ sin imagen para este numero ]<br>
+      elegi un archivo abajo
+    </div>
+  </div>
+
+  <div class="file-row">
+    <input type="file" id="imgInput" accept="image/*">
+  </div>
+  <div class="caption" id="caption"></div>
+
+</div>
+
+<script>
+  const STORAGE_KEY = 'contador_valor';
+  const IMG_PREFIX = 'contador_img_';
+
+  const countEl = document.getElementById('countNumber');
+  const imgBox = document.getElementById('imgBox');
+  const imgPlaceholder = document.getElementById('imgPlaceholder');
+  const imgInput = document.getElementById('imgInput');
+  const caption = document.getElementById('caption');
+
+  let count = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
+
+  function render(){
+    countEl.textContent = count;
+    localStorage.setItem(STORAGE_KEY, String(count));
+    loadImageForCount();
+  }
+
+  function loadImageForCount(){
+    const saved = localStorage.getItem(IMG_PREFIX + count);
+    const existing = imgBox.querySelector('img');
+    if (existing) existing.remove();
+
+    if (saved){
+      const img = document.createElement('img');
+      img.src = saved;
+      imgBox.appendChild(img);
+      imgPlaceholder.style.display = 'none';
+      caption.textContent = 'imagen guardada para el numero ' + count;
+    } else {
+      imgPlaceholder.style.display = 'block';
+      caption.textContent = '';
+    }
+  }
+
+  document.getElementById('incrementBtn').addEventListener('click', () => {
+    count += 1;
+    render();
+  });
+
+  document.getElementById('decrementBtn').addEventListener('click', () => {
+    if (count > 0) count -= 1;
+    render();
+  });
+
+ 
+
+  imgInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt){
+      localStorage.setItem(IMG_PREFIX + count, evt.target.result);
+      loadImageForCount();
+    };
+    reader.readAsDataURL(file);
+  });
+
+  render();
+</script>
+</body>
+</html>
